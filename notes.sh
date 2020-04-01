@@ -1,10 +1,11 @@
-#other scripts: https://digint.ch/btrbk/
-#               https://btrfs.wiki.kernel.org/index.php/Incremental_Backup#Available_Backup_Tools
+#script:        https://btrfs.wiki.kernel.org/index.php/Incremental_Backup#Available_Backup_Tools
+#https://github.com/digint/btrbk
 
 #Note: btrfs-send needs read-only snapshots!
 
 # Create a read-only snapshot
-btrfs subvolume snapshot -r /home /mnt/backup
+btrfs subvolume snapshot -r /home /mnt/backup && sync
+btrfs subvolume snapshot -r / /my/snapshot-YYYY-MM-DD && sync
 
 # Initially transfer the whole subvolume
 btrfs send /mnt/backup | ssh root@backup.home btrfs receive /mnt/homeFromPC
@@ -12,6 +13,14 @@ btrfs send /mnt/backup | ssh root@backup.home btrfs receive /mnt/homeFromPC
 # Transfer the changes since `backup`
 btrfs subvolume snapshot -r /home /mnt/backup-new
 btrfs send -p /mnt/backup /mnt/backup-new | ssh root@backup.home btrfs receive /mnt/homeFromPC
+btrfs send -p /my/snapshot-YYYY-MM-DD /my/incremental-snapshot-YYYY-MM-DD | ssh user@host btrfs receive /backup/home
+
+#streams
+
+btrfs subvolume snapshot -r / /my/snapshot-YYYY-MM-DD && sync
+btrfs send /my/snapshot-YYYY-MM-DD | ssh user@host 'cat >/backup/home/snapshot-YYYY-MM-DD.btrfs'
+btrfs subvolume snapshot -r / /my/incremental-snapshot-YYYY-MM-DD && sync
+btrfs send -p /my/snapshot-YYYY-MM-DD /my/incremental-snapshot-YYYY-MM-DD | ssh user@host 'cat >/backup/home/incremental-snapshot-YYYY-MM-DD.btrfs'
 
 ################################
 #Backups to a none-btrfs target#
