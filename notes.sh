@@ -1,6 +1,10 @@
 #script:        https://btrfs.wiki.kernel.org/index.php/Incremental_Backup#Available_Backup_Tools
 #https://github.com/digint/btrbk
 
+#Snyc-snapshots: https://ownyourbits.com/2018/03/09/easy-sync-of-btrfs-snapshots-with-btrfs-sync/
+#installing on btrfs: https://ramsdenj.com/2016/04/05/using-btrfs-for-easy-backup-and-rollback.html
+
+
 #Note: btrfs-send needs read-only snapshots!
 
 # Create a read-only snapshot
